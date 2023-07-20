@@ -1,0 +1,65 @@
+---
+- name: Install SendPortal
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name: ['php', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-zip', 'composer', 'mysql-server', 'mysql-client', 'php-mysql']
+        state: present
+
+    - name: Install SendPortal dependencies
+      composer:
+        command: install
+        working_dir: /var/www/html/sendportal
+        no_dev: true
+
+    - name: Configure database
+      mysql_db:
+        name: sendportal
+        state: present
+        login_user: root
+        login_password: YOUR_MYSQL_ROOT_PASSWORD
+
+    - name: Create database user
+      mysql_user:
+        name: sendportal
+        password: YOUR_DATABASE_USER_PASSWORD
+        priv: 'sendportal.*:ALL'
+        host: localhost
+        login_user: root
+        login_password: YOUR_MYSQL_ROOT_PASSWORD
+
+    - name: Configure SendPortal environment
+      template:
+        src: sendportal.env.j2
+        dest: /var/www/html/sendportal/.env
+        owner: www-data
+        group: www-data
+
+    - name: Generate application key
+      shell: php artisan key:generate
+      args:
+        chdir: /var/www/html/sendportal
+        executable: /bin/bash
+
+    - name: Run database migrations
+      shell: php artisan migrate --force
+      args:
+        chdir: /var/www/html/sendportal
+        executable: /bin/bash
+
+    - name: Set appropriate permissions
+      file:
+        path: /var/www/html/sendportal/storage
+        owner: www-data
+        group: www-data
+        state: directory
+        recurse: yes
+
+    - name: Start SendPortal
+      shell: php artisan serve
+      args:
+        chdir: /var/www/html/sendportal
+        executable: /bin/bash
