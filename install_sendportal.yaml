@@ -2,6 +2,8 @@
 - name: Install SendPortal
   hosts: all
   become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
   tasks:
     - name: Install required packages
@@ -15,11 +17,6 @@
         working_dir: /var/www/html/sendportal
         no_dev: true
         
-    - name: misc task on ubuntu 18.04 instance
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
-      tasks:
-        - debug: var=ansible_host
     - name: Configure database
       mysql_db:
         name: sendportal
