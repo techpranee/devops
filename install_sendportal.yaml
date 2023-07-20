@@ -4,7 +4,7 @@
   become: true
   # vars:
   #   ansible_python_interpreter: /usr/bin/python3
-  
+
   tasks:
     - name: Install required packages
       apt:
@@ -16,6 +16,11 @@
         command: install
         working_dir: /var/www/html/sendportal
         no_dev: true
+        
+    - name: Check if MySql is present
+      pip:
+        name: pymysql
+        state: present
         
     - name: Configure database
       mysql_db:
