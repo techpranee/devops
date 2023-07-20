@@ -14,6 +14,7 @@
         command: install
         working_dir: /var/www/html/sendportal
         no_dev: true
+        
     - name: misc task on ubuntu 18.04 instance
       vars:
         ansible_python_interpreter: /usr/bin/python3
