@@ -8,7 +8,7 @@
   tasks:
     - name: Install required packages
       apt:
-        name: ['php', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-zip', 'composer', 'mysql-server', 'mysql-client', 'php-mysql']
+        name: ['php', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-zip', 'composer', 'mysql-server', 'mysql-client', 'php-mysql', 'python3-mysqldb']
         state: present
 
     - name: Install SendPortal dependencies
@@ -16,12 +16,7 @@
         command: install
         working_dir: /var/www/html/sendportal
         no_dev: true
-        
-    - name: Check if MySql is present
-      pip:
-        name: pymysql
-        state: present
-        
+
     - name: Configure database
       mysql_db:
         name: sendportal
