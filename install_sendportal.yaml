@@ -12,6 +12,7 @@
     - name: Install SendPortal dependencies
       composer:
         command: install
+        become: false
         working_dir: /var/www/html/sendportal
         no_dev: true
 
