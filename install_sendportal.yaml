@@ -21,12 +21,12 @@
         chdir: /var/www/html/sendportal
         executable: /bin/bash
 
-    - name: Install SendPortal dependencies
-      composer:
-        command: install
-        arguments: [--no-plugins --no-scripts]
-        working_dir: /var/www/html/sendportal
-        no_dev: true
+    # - name: Install SendPortal dependencies
+    #   composer:
+    #     command: install
+    #     arguments: [--no-plugins --no-scripts]
+    #     working_dir: /var/www/html/sendportal
+    #     no_dev: true
 
     - name: Configure database
       mysql_db:
