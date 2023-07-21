@@ -24,7 +24,7 @@
     - name: Install SendPortal dependencies
       composer:
         command: install
-        argumants: [--no-plugins --no-scripts]
+        arguments: [--no-plugins --no-scripts]
         working_dir: /var/www/html/sendportal
         no_dev: true
 
