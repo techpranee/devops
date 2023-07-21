@@ -2,14 +2,24 @@
 - name: Install SendPortal
   hosts: all
   become: true
-  # vars:
-  #   ansible_python_interpreter: /usr/bin/python3
 
   tasks:
     - name: Install required packages
       apt:
-        name: ['php', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-zip', 'composer', 'mysql-server', 'mysql-client', 'php-mysql', 'python3-mysqldb']
+        name: ['php', 'php-curl', 'git', 'php-json', 'php-mbstring', 'php-xml', 'php-zip', 'composer', 'mysql-server', 'mysql-client', 'php-mysql']
         state: present
+
+    - name: Creates directory for sendportal
+      file:
+        path: /var/www/html/sendportal
+        state: directory
+        mode: '0755' 
+
+    - name: download send portal
+      shell: git clone --depth 1 --branch v2.0.0 https://github.com/mettle/sendportal.git
+      args:
+        chdir: /var/www/html/sendportal
+        executable: /bin/bash
 
     - name: Install SendPortal dependencies
       composer:
