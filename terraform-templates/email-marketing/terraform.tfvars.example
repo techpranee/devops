@@ -1,0 +1,48 @@
+# Copy this file to terraform.tfvars and fill in your actual values
+# DO NOT commit terraform.tfvars to git!
+
+# Required Variables - Cloudflare Configuration
+CLOUDFLARE_API_TOKEN         = "your-cloudflare-api-token"
+primary_cloudflare_zone_id   = "zone-id-for-primary-domain"
+warmup_cloudflare_zone_id    = ""  # Leave empty if same as primary, or set different zone ID
+
+# Multi-Domain Setup (Primary + 2 Warm-up Domains)
+# 
+# Scenario 1: All domains on same root (e.g., yourdomain.com)
+# primary_domain    = "mail.yourdomain.com"
+# warmup_domain_1   = "mail1.yourdomain.com"
+# warmup_domain_2   = "mail2.yourdomain.com"
+# warmup_cloudflare_zone_id = ""  # Leave empty - will use primary zone
+#
+# Scenario 2: Different root domains
+# primary_domain    = "mail.yourdomain.com"
+# warmup_domain_1   = "mail.anotherdomain.com"
+# warmup_domain_2   = "mail.thirddomain.com"
+# warmup_cloudflare_zone_id = "zone-id-for-warmup-domains"
+
+primary_domain    = "mail.yourdomain.com"      # Your main email domain
+warmup_domain_1   = "mail1.yourdomain.com"     # First warm-up domain
+warmup_domain_2   = "mail2.yourdomain.com"     # Second warm-up domain
+
+# Optional Configuration
+ses_region = "ap-south-1"
+
+# DMARC Configuration (Different policies for primary vs warm-up)
+primary_dmarc_policy = "quarantine"  # Stricter for production (quarantine | reject)
+warmup_dmarc_policy  = "none"        # Relaxed for warm-up domains (none)
+dmarc_rua           = "dmarc@yourdomain.com"
+
+# MAIL FROM Configuration
+create_mail_from = true
+mail_from_prefix = "mail"  # Creates mail.domain.com for each domain
+
+# SNS Configuration (Creates separate topics for each domain)
+create_sns_topics         = true
+enable_cloudwatch_events  = true
+
+# Tagging
+tags = {
+  Environment = "production"
+  Project     = "email-marketing"
+  Owner       = "devops-team"
+}
