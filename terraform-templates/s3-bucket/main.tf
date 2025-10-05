@@ -299,3 +299,130 @@ resource "aws_s3_bucket_policy" "cloudfront_oac" {
 #     events              = ["s3:ObjectCreated:*"]
 #   }
 # }
+
+###############################################################################
+# TWENTY CRM S3 BUCKET
+###############################################################################
+resource "aws_s3_bucket" "twenty_crm" {
+  bucket = var.twenty_crm_bucket_name
+
+  tags = {
+    Name        = "TwentyCRMUploads"
+    Environment = "production"
+    ManagedBy   = "Terraform"
+  }
+}
+
+###############################################################################
+# TWENTY CRM BUCKET VERSIONING
+###############################################################################
+resource "aws_s3_bucket_versioning" "twenty_crm" {
+  bucket = aws_s3_bucket.twenty_crm.id
+  
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+###############################################################################
+# TWENTY CRM BUCKET SERVER-SIDE ENCRYPTION
+###############################################################################
+resource "aws_s3_bucket_server_side_encryption_configuration" "twenty_crm" {
+  bucket = aws_s3_bucket.twenty_crm.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+###############################################################################
+# BLOCK PUBLIC ACCESS FOR TWENTY CRM BUCKET
+###############################################################################
+resource "aws_s3_bucket_public_access_block" "twenty_crm_block" {
+  bucket                  = aws_s3_bucket.twenty_crm.id
+  block_public_acls        = true
+  block_public_policy      = true
+  ignore_public_acls       = true
+  restrict_public_buckets  = true
+}
+
+###############################################################################
+# CORS CONFIG FOR TWENTY CRM BUCKET (only if frontend uploads directly)
+###############################################################################
+resource "aws_s3_bucket_cors_configuration" "twenty_crm_cors" {
+  bucket = aws_s3_bucket.twenty_crm.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST", "DELETE"]
+    allowed_origins = ["https://20.techpranee.com"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
+###############################################################################
+# IAM USER FOR TWENTY CRM
+###############################################################################
+resource "aws_iam_user" "twenty_crm_user" {
+  name = var.twenty_crm_iam_user_name
+  tags = {
+    Purpose     = "Twenty CRM S3 Access"
+    Environment = "production"
+  }
+}
+
+###############################################################################
+# IAM POLICY FOR TWENTY CRM
+###############################################################################
+data "aws_iam_policy_document" "twenty_crm_policy_doc" {
+  statement {
+    sid    = "TwentyCRMListBucket"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      aws_s3_bucket.twenty_crm.arn
+    ]
+  }
+
+  statement {
+    sid    = "TwentyCRMObjectAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.twenty_crm.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "twenty_crm_policy" {
+  name   = "twenty-crm-s3-policy"
+  policy = data.aws_iam_policy_document.twenty_crm_policy_doc.json
+}
+
+###############################################################################
+# ATTACH POLICY TO TWENTY CRM USER
+###############################################################################
+resource "aws_iam_user_policy_attachment" "twenty_crm_attach" {
+  user       = aws_iam_user.twenty_crm_user.name
+  policy_arn = aws_iam_policy.twenty_crm_policy.arn
+}
+
+###############################################################################
+# ACCESS KEYS FOR TWENTY CRM
+###############################################################################
+resource "aws_iam_access_key" "twenty_crm_access_key" {
+  user = aws_iam_user.twenty_crm_user.name
+}

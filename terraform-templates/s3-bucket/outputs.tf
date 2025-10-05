@@ -132,3 +132,27 @@ output "bimi_assets_url" {
     "Private bucket - use CloudFront or signed URLs"
   )
 }
+
+###############################################################################
+# TWENTY CRM BUCKET OUTPUTS
+###############################################################################
+output "twenty_crm_s3_bucket_name" {
+  description = "Name of the Twenty CRM S3 bucket"
+  value       = aws_s3_bucket.twenty_crm.bucket
+}
+
+output "twenty_crm_iam_user_name" {
+  description = "IAM user name for Twenty CRM S3 access"
+  value       = aws_iam_user.twenty_crm_user.name
+}
+
+output "twenty_crm_aws_access_key_id" {
+  description = "Access key ID for Twenty CRM IAM user"
+  value       = aws_iam_access_key.twenty_crm_access_key.id
+}
+
+output "twenty_crm_aws_secret_access_key" {
+  description = "Secret access key for Twenty CRM IAM user"
+  value       = aws_iam_access_key.twenty_crm_access_key.secret
+  sensitive   = true
+}

@@ -177,3 +177,18 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+###############################################################################
+# TWENTY CRM BUCKET VARIABLES
+###############################################################################
+variable "twenty_crm_bucket_name" {
+  description = "Name of the Twenty CRM S3 bucket"
+  type        = string
+  default     = "twenty-crm-uploads"
+}
+
+variable "twenty_crm_iam_user_name" {
+  description = "IAM user name for Twenty CRM S3 access"
+  type        = string
+  default     = "twenty-crm-storage"
+}
