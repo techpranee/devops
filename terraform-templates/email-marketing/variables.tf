@@ -98,6 +98,31 @@ variable "enable_cloudwatch_events" {
   default     = true
 }
 
+# BIMI Configuration
+variable "enable_bimi" {
+  description = "Enable BIMI (Brand Indicators for Message Identification) for the primary domain"
+  type        = bool
+  default     = false
+}
+
+variable "bimi_svg_url" {
+  description = "HTTPS URL to the BIMI-compliant SVG logo for the primary domain"
+  type        = string
+  default     = ""
+}
+
+variable "bimi_vmc_url" {
+  description = "Optional HTTPS URL to your Verified Mark Certificate (VMC) in PEM format"
+  type        = string
+  default     = ""
+}
+
+variable "bimi_selector" {
+  description = "BIMI selector label (most deployments use 'default')"
+  type        = string
+  default     = "default"
+}
+
 variable "tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

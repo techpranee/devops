@@ -63,3 +63,20 @@ output "configuration_sets" {
     warmup2_config   = module.ses_domain["warmup2"].configuration_set_name
   }
 }
+
+# BIMI Outputs
+output "bimi_configuration" {
+  description = "BIMI configuration details for the primary domain"
+  value = var.enable_bimi && var.bimi_svg_url != "" ? {
+    enabled        = true
+    domain         = var.primary_domain
+    bimi_record    = length(module.bimi_primary) > 0 ? module.bimi_primary[0].bimi_record_name : null
+    bimi_value     = length(module.bimi_primary) > 0 ? module.bimi_primary[0].bimi_record_value : null
+    svg_url        = var.bimi_svg_url
+    vmc_url        = var.bimi_vmc_url != "" ? var.bimi_vmc_url : "Not configured"
+    selector       = var.bimi_selector
+  } : {
+    enabled = false
+    message = "BIMI is disabled or SVG URL not provided"
+  }
+}

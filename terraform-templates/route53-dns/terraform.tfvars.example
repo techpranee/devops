@@ -1,0 +1,112 @@
+# Example Terraform Variables Configuration
+# Copy this file to terraform.tfvars and modify the values according to your needs
+
+# Required Variables
+domain_name  = "example.com"
+project_name = "my-project"
+
+# Optional Variables
+aws_region  = "ap-south-1"
+environment = "dev"
+
+# Hosted Zone Configuration
+create_hosted_zone        = true
+zone_type                = "public"  # public or private
+hosted_zone_comment      = "Managed by Terraform - Example Domain"
+force_destroy_hosted_zone = false
+
+# VPC Associations (only for private hosted zones)
+# vpc_associations = [
+#   {
+#     vpc_id     = "vpc-12345678"
+#     vpc_region = "ap-south-1"
+#   }
+# ]
+
+# DNS Records Configuration
+dns_records = [
+  # Basic A record
+  {
+    name    = "www"
+    type    = "A"
+    ttl     = 300
+    records = ["192.168.1.100"]
+  },
+  # CNAME record
+  {
+    name    = "blog"
+    type    = "CNAME"
+    ttl     = 300
+    records = ["www.example.com"]
+  },
+  # MX record for email
+  {
+    name    = ""  # Root domain
+    type    = "MX"
+    ttl     = 300
+    records = ["10 mail.example.com"]
+  },
+  # TXT record for SPF
+  {
+    name    = ""  # Root domain
+    type    = "TXT"
+    ttl     = 300
+    records = ["v=spf1 include:_spf.google.com ~all"]
+  }
+  # Example with weighted routing
+  # {
+  #   name           = "api"
+  #   type           = "A"
+  #   ttl            = 60
+  #   records        = ["1.2.3.4"]
+  #   set_identifier = "server-1"
+  #   weighted_routing_policy = {
+  #     weight = 70
+  #   }
+  # }
+]
+
+# Alias Records for AWS Resources
+alias_records = [
+  # Example CloudFront distribution
+  # {
+  #   name                   = "cdn"
+  #   type                   = "A"
+  #   alias_name            = "d123456789.cloudfront.net"
+  #   alias_zone_id         = "Z2FDTNDATAQYW2"  # CloudFront zone ID
+  #   evaluate_target_health = false
+  # },
+  # Example Application Load Balancer
+  # {
+  #   name                   = "app"
+  #   type                   = "A"
+  #   alias_name            = "my-alb-123456789.us-west-2.elb.amazonaws.com"
+  #   alias_zone_id         = "Z1D633PJN98FT9"  # ALB zone ID for us-west-2
+  #   evaluate_target_health = true
+  # }
+]
+
+# Health Checks
+health_checks = [
+  # Example HTTPS health check
+  # {
+  #   reference_name                      = "website-health-check"
+  #   fqdn                               = "www.example.com"
+  #   port                               = 443
+  #   type                               = "HTTPS"
+  #   resource_path                      = "/health"
+  #   failure_threshold                  = 3
+  #   request_interval                   = 30
+  #   measure_latency                    = true
+  #   invert_healthcheck                 = false
+  #   insufficient_data_health_status    = "Failure"
+  #   enable_sni                         = true
+  # }
+]
+
+# Additional Tags
+tags = {
+  Owner       = "DevOps Team"
+  CostCenter  = "IT"
+  Application = "Website"
+}

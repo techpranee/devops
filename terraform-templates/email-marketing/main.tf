@@ -80,3 +80,15 @@ module "ses_domain" {
     enable_cloudwatch = var.enable_cloudwatch_events
   }
 }
+
+# Create BIMI record for primary domain only
+module "bimi_primary" {
+  count  = var.enable_bimi && var.bimi_svg_url != "" ? 1 : 0
+  source = "./modules/bimi-cloudflare"
+  
+  identity_domain    = var.primary_domain
+  cloudflare_zone_id = var.primary_cloudflare_zone_id
+  bimi_selector      = var.bimi_selector
+  bimi_svg_url       = var.bimi_svg_url
+  vmc_url            = var.bimi_vmc_url
+}
