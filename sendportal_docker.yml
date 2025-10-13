@@ -1,0 +1,78 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+
+    - name: Install APT Transport HTTPS and other necessary packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - git
+
+    - name: Add Docker's official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Verify key fingerprint
+      command: apt-key fingerprint 0EBFCD88
+      register: result
+      failed_when: "'9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88' not in result.stdout_lines"
+
+    - name: Add Docker's official APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+        state: present
+
+    - name: Install Docker CE
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+
+    - name: Install pip (Python package manager)
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install Docker Compose via pip
+      pip:
+        name: docker-compose
+
+    - name: Clone SendPortal repository
+      git:
+        repo: 'https://github.com/mettle/sendportal.git'
+        dest: '/home/ubuntu/sendportal'
+
+    - name: Copy .env.example to .env
+      copy:
+        src: '/home/ubuntu/sendportal/.env.example'
+        dest: '/home/ubuntu/sendportal/.env'
+        remote_src: yes
+
+    - name: Wait for Docker to be ready
+      command: docker info
+      register: docker_info
+      until: docker_info.rc == 0
+      retries: 12
+      delay: 5
+
+    - name: Run docker-compose up -d
+      command: docker-compose up -d
+      args:
+        chdir: /home/ubuntu/sendportal/
